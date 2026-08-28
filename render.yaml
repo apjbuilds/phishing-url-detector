@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: phishing-detector
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    autoDeploy: true

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Phishing Detector</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; background: #0b1020; color: #edf2ff; font-family: Arial, sans-serif; }
+    main { width: min(100%, 680px); padding: 42px; border: 1px solid #2b3964; border-radius: 20px; background: #141c33; box-shadow: 0 20px 50px #0006; }
+    .eyebrow { color: #8eb4ff; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; font-size: .78rem; }
+    h1 { margin: 10px 0; font-size: clamp(2rem, 6vw, 3.2rem); }
+    p { color: #bdc8e6; line-height: 1.55; }
+    form { display: flex; gap: 10px; margin-top: 30px; }
+    input { min-width: 0; flex: 1; padding: 15px; border: 1px solid #51628e; border-radius: 10px; background: #0b1020; color: #fff; font-size: 1rem; }
+    button { border: 0; border-radius: 10px; padding: 0 20px; background: #5b8cff; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; }
+    button:disabled { opacity: .65; cursor: wait; }
+    #result { display: none; margin-top: 24px; padding: 18px; border-radius: 12px; font-weight: 700; }
+    #result.legitimate { display: block; background: #123d30; color: #a9f4cc; }
+    #result.phishing { display: block; background: #4d202b; color: #ffc0c8; }
+    #result.error { display: block; background: #4b3b17; color: #ffdf8b; }
+    details { margin-top: 22px; padding: 16px; border: 1px solid #34446f; border-radius: 10px; background: #10182d; }
+    summary { color: #dce6ff; font-weight: 700; cursor: pointer; }
+    details p, details ul { margin: 14px 0 0; }
+    details li { color: #bdc8e6; margin: 7px 0; line-height: 1.45; }
+    .note { margin-top: 24px; font-size: .85rem; }
+    @media (max-width: 560px) { main { padding: 28px; } form { flex-direction: column; } button { padding: 15px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow">College project</div>
+    <h1>Phishing Detector</h1>
+    <p>Check a suspicious link before you open it.</p>
+    <form id="checker">
+      <input id="url" type="text" placeholder="example.com or https://example.com" required autocomplete="url">
+      <button id="submit" type="submit">Check link</button>
+    </form>
+    <div id="result" role="status" aria-live="polite"></div>
+    <details>
+      <summary>How was this created?</summary>
+      <p>This project uses a Random Forest machine-learning model trained on a phishing-URL dataset and additional verified legitimate domains.</p>
+      <ul>
+        <li>It checks URL signals such as length, digits, special characters, HTTPS, IP addresses, and brand-name similarity.</li>
+        <li>It also looks at basic page signals, such as page structure, links, mobile responsiveness, and iframes.</li>
+        <li>The model returns a prediction and confidence score, but it cannot guarantee a website is safe.</li>
+        <li>Some websites block automated checks. In that case, the app says it could not inspect the site instead of guessing.</li>
+      </ul>
+    </details>
+    <p class="note">This is an educational prediction tool, not a guarantee of safety. Do not enter passwords or personal information on a site you do not trust.</p>
+  </main>
+  <script>
+    const form = document.querySelector('#checker');
+    const input = document.querySelector('#url');
+    const button = document.querySelector('#submit');
+    const result = document.querySelector('#result');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      button.disabled = true;
+      button.textContent = 'Checking…';
+      result.className = '';
+      result.style.display = 'none';
+      try {
+        const response = await fetch('/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: input.value.trim() })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Something went wrong.');
+        const isLegitimate = data.prediction === 'Legitimate';
+        result.className = isLegitimate ? 'legitimate' : 'phishing';
+        result.textContent = `${data.prediction} — ${data.confidence}% confidence`;
+      } catch (error) {
+        result.className = 'error';
+        result.textContent = error.message;
+      } finally {
+        result.style.display = 'block';
+        button.disabled = false;
+        button.textContent = 'Check link';
+      }
+    });
+  </script>
+</body>
+</html>
