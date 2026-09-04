@@ -1,5 +1,4 @@
-"""Train the production phishing detector model without refetching web pages."""
-
+#training
 import pickle
 import re
 
