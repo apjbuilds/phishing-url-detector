@@ -13,8 +13,7 @@ CORS(app)
 with open('phishing_model.pkl', 'rb') as f:
     saved_model = pickle.load(f)
 
-# Newer model files include the exact feature order.  Keep the fallback so the
-# app gives a clear message until the model has been retrained once.
+
 if isinstance(saved_model, dict):
     model = saved_model['model']
     feature_order = saved_model['feature_columns']
