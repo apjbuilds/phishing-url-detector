@@ -2,6 +2,6 @@ services:
   - type: web
     name: phishing-detector
     runtime: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && playwright install --with-deps chromium
     startCommand: gunicorn app:app
     autoDeploy: true
