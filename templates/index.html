@@ -322,7 +322,7 @@
       background: rgba(120, 90, 25, 0.16);
     }
 
-    details {
+    .info-section {
       position: relative;
       z-index: 1;
       margin-top: 30px;
@@ -330,48 +330,80 @@
       padding-top: 18px;
     }
 
-    summary {
-      list-style: none;
-      cursor: pointer;
+    .info-toggle {
+      width: 100%;
+      height: auto;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
       color: #8c8d89;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font: inherit;
       font-size: 13px;
       font-weight: 500;
-      user-select: none;
+      cursor: pointer;
+      text-align: left;
     }
 
-    summary::-webkit-details-marker {
-      display: none;
+    .info-toggle:hover {
+      background: transparent;
+      color: #aaaaa6;
+      transform: none;
     }
 
-    summary::after {
-      content: "+";
-      float: right;
+    .info-icon {
       color: #6f706d;
       font-size: 18px;
-      line-height: 12px;
-      transition: transform 180ms ease;
+      line-height: 1;
+      transition: transform 220ms ease;
     }
 
-    details[open] summary::after {
+    .info-toggle.open .info-icon {
       transform: rotate(45deg);
     }
 
-    details p,
-    details ul {
-      margin-top: 18px;
+    .info-content {
+      display: grid;
+      grid-template-rows: 0fr;
+      opacity: 0;
+      overflow: hidden;
+      transition:
+        grid-template-rows 320ms ease,
+        opacity 220ms ease;
     }
 
-    details p {
+    .info-content.open {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+
+    .info-inner {
+      min-height: 0;
+      overflow: hidden;
+      padding-top: 0;
+      transition: padding-top 320ms ease;
+    }
+
+    .info-content.open .info-inner {
+      padding-top: 18px;
+    }
+
+    .info-inner p {
+      margin: 0;
       color: #8d8e8a;
       font-size: 13px;
       line-height: 1.65;
     }
 
-    details ul {
+    .info-inner ul {
+      margin: 18px 0 0;
       padding-left: 18px;
     }
 
-    details li {
+    .info-inner li {
       margin: 8px 0;
       color: #7f807c;
       font-size: 13px;
@@ -525,36 +557,43 @@
           aria-live="polite"
         ></div>
 
-        <details>
-          <summary>How was this created?</summary>
+        <div class="info-section">
+          <button class="info-toggle" id="infoToggle" type="button">
+            <span>How was this created?</span>
+            <span class="info-icon">+</span>
+          </button>
 
-          <p>
-            This project uses a Random Forest machine-learning model trained
-            on a phishing-URL dataset and additional verified legitimate domains.
-          </p>
+          <div class="info-content" id="infoContent">
+            <div class="info-inner">
+              <p>
+                This project uses a Random Forest machine-learning model trained
+                on a phishing-URL dataset and additional verified legitimate domains.
+              </p>
 
-          <ul>
-            <li>
-              It checks URL signals such as length, digits, special characters,
-              HTTPS, IP addresses, and brand-name similarity.
-            </li>
+              <ul>
+                <li>
+                  It checks URL signals such as length, digits, special characters,
+                  HTTPS, IP addresses, and brand-name similarity.
+                </li>
 
-            <li>
-              It also looks at basic page signals, such as page structure,
-              links, mobile responsiveness, and iframes.
-            </li>
+                <li>
+                  It also looks at basic page signals, such as page structure,
+                  links, mobile responsiveness, and iframes.
+                </li>
 
-            <li>
-              The model returns a prediction and confidence score,
-              but it cannot guarantee a website is safe.
-            </li>
+                <li>
+                  The model returns a prediction and confidence score,
+                  but it cannot guarantee a website is safe.
+                </li>
 
-            <li>
-              Some websites block automated checks. In that case,
-              the app says it could not inspect the site instead of guessing.
-            </li>
-          </ul>
-        </details>
+                <li>
+                  Some websites block automated checks. In that case,
+                  the app says it could not inspect the site instead of guessing.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
 
         <div class="project-info">
           <div class="project-label">
@@ -593,6 +632,14 @@
     const input = document.querySelector('#url');
     const button = document.querySelector('#submit');
     const result = document.querySelector('#result');
+
+    const infoToggle = document.querySelector('#infoToggle');
+    const infoContent = document.querySelector('#infoContent');
+
+    infoToggle.addEventListener('click', () => {
+      infoToggle.classList.toggle('open');
+      infoContent.classList.toggle('open');
+    });
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
