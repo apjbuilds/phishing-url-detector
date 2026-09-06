@@ -1,3 +1,4 @@
+https://phishing-url-detector-xscr.onrender.com/
 google.com
 cloudflare.com
 facebook.com
@@ -1957,3 +1958,4 @@ filmyfly.faith
 vidylee.click
 1drv.com
 blacktoon417.com
+https://phishing-url-detector-xscr.onrender.com/
