@@ -21,7 +21,6 @@
       position: relative;
     }
 
-    /* Ambient background glows to simulate the 3D space */
     body::before, body::after {
       content: '';
       position: absolute;
@@ -41,7 +40,6 @@
       bottom: -15%; right: -5%;
     }
 
-    /* The Glass Panel */
     main { 
       width: min(100%, 680px); 
       padding: 42px; 
@@ -74,7 +72,6 @@
     
     form { display: flex; gap: 12px; margin-top: 32px; }
     
-    /* Glass Inputs */
     input { 
       min-width: 0; 
       flex: 1; 
@@ -93,7 +90,6 @@
       box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
     }
     
-    /* Glowing Button */
     button { 
       border: 0; 
       border-radius: 12px; 
@@ -112,7 +108,6 @@
     }
     button:disabled { opacity: .6; cursor: wait; transform: none; box-shadow: none; }
     
-    /* Glass Results */
     #result { 
       display: none; 
       margin-top: 24px; 
@@ -126,7 +121,6 @@
     #result.phishing { background: rgba(77, 32, 43, 0.4); color: #ff9fa9; border-color: rgba(255, 159, 169, 0.2); }
     #result.error { background: rgba(75, 59, 23, 0.4); color: #fce28b; border-color: rgba(252, 226, 139, 0.2); }
     
-    /* Glass Accordion */
     details { 
       margin-top: 32px; 
       padding: 18px; 
