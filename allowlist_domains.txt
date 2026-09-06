@@ -108,6 +108,8 @@ app-analytics-services.com
 app-measurement.com
 amazonvideo.com
 cdn77.org
+schoology.com
+powerschool.com
 apache.org
 vkuserphoto.ru
 snapchat.com
