@@ -2,10 +2,10 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import pickle
 import re
+import requests
 from bs4 import BeautifulSoup
 from difflib import SequenceMatcher
 from urllib.parse import urlsplit
-from playwright.sync_api import sync_playwright
 
 app = Flask(__name__)
 CORS(app)
@@ -41,11 +41,6 @@ except FileNotFoundError:
 common_brands = ['amazon', 'paypal', 'metamask', 'microsoft', 'apple', 'google',
                   'facebook', 'netflix', 'bank', 'chase', 'wellsfargo', 'coinbase',
                   'binance', 'instagram', 'linkedin', 'ebay', 'walmart']
-
-# One shared headless browser for the life of the app, instead of launching a
-# new one per request - much faster for a live web app handling requests one at a time.
-_playwright = sync_playwright().start()
-_browser = _playwright.chromium.launch()
 
 
 @app.route('/')
@@ -99,16 +94,13 @@ def extract_url_features(url):
 
 
 def extract_page_features(url):
-    """Fetches the page with a real headless browser so JavaScript-heavy sites
-    render fully before we read the HTML, instead of seeing a loading skeleton."""
     try:
-        page = _browser.new_page()
-        try:
-            page.goto(url, timeout=10000, wait_until='networkidle')
-            html = page.content()
-        finally:
-            page.close()
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+        response = requests.get(url, headers=headers, timeout=5)
+        if response.status_code != 200:
+            return None
 
+        html = response.text
         soup = BeautifulSoup(html, 'html.parser')
         domain = url.replace('https://', '').replace('http://', '').split('/')[0]
         links = soup.find_all('a', href=True)
@@ -122,7 +114,7 @@ def extract_page_features(url):
             'IsResponsive': 1 if 'viewport' in html.lower() else 0,
             'NoOfiFrame': len(soup.find_all('iframe'))
         }
-    except Exception:
+    except requests.RequestException:
         return None
 
 
