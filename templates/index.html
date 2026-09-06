@@ -3,135 +3,577 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>Phishing Detector</title>
+
   <style>
-    :root { color-scheme: dark; }
-    * { box-sizing: border-box; }
-    
-    body { 
-      margin: 0; 
-      min-height: 100vh; 
-      display: grid; 
-      place-items: center; 
-      padding: 24px; 
-      background-color: #0a0a0c; 
-      color: #edf2ff; 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-      overflow-x: hidden;
-      position: relative;
+    :root {
+      color-scheme: dark;
+      --bg: #080909;
+      --text: #f3f3f0;
+      --muted: #8d8d89;
+      --line: rgba(255, 255, 255, 0.16);
+      --glass: rgba(20, 20, 20, 0.58);
     }
 
-    body::before, body::after {
-      content: '';
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 45%, #171817 0%, #0c0d0d 38%, #070808 75%);
+      color: var(--text);
+      font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+    }
+
+    .scene {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      min-height: 650px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      isolation: isolate;
+    }
+
+    .ambient {
       position: absolute;
       border-radius: 50%;
-      z-index: -1;
-      filter: blur(80px);
       pointer-events: none;
-    }
-    body::before {
-      width: 400px; height: 400px;
-      background: rgba(255, 255, 255, 0.04);
-      top: -10%; left: 15%;
-    }
-    body::after {
-      width: 500px; height: 500px;
-      background: rgba(255, 255, 255, 0.03);
-      bottom: -15%; right: -5%;
+      z-index: -2;
+      filter: blur(1px);
     }
 
-    main { 
-      width: min(100%, 680px); 
-      padding: 42px; 
-      background: rgba(255, 255, 255, 0.04); 
-      border: 1px solid rgba(255, 255, 255, 0.1); 
-      border-radius: 24px; 
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1); 
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+    .ambient.one {
+      width: 190px;
+      height: 190px;
+      left: calc(50% - 360px);
+      top: 50%;
+      transform: translateY(-25%);
+      background:
+        radial-gradient(
+          circle at 32% 28%,
+          #777876 0%,
+          #454645 22%,
+          #272827 55%,
+          #101110 78%,
+          transparent 80%
+        );
+      box-shadow:
+        inset -25px -30px 45px rgba(0, 0, 0, 0.75),
+        inset 12px 10px 25px rgba(255, 255, 255, 0.08),
+        0 25px 60px rgba(0, 0, 0, 0.65);
+    }
+
+    .ambient.two {
+      width: 110px;
+      height: 110px;
+      left: calc(50% - 65px);
+      top: calc(50% - 250px);
+      background:
+        radial-gradient(
+          circle at 37% 32%,
+          #858785 0%,
+          #4b4d4b 30%,
+          #252625 68%,
+          #0c0d0d 100%
+        );
+      box-shadow:
+        inset -18px -20px 25px rgba(0, 0, 0, 0.7),
+        inset 7px 8px 15px rgba(255, 255, 255, 0.08);
+    }
+
+    .ambient.three {
+      width: 125px;
+      height: 125px;
+      left: calc(50% + 175px);
+      top: calc(50% - 140px);
+      background:
+        radial-gradient(
+          circle at 32% 30%,
+          #777976 0%,
+          #494b49 25%,
+          #272927 62%,
+          #0e0f0e 100%
+        );
+      box-shadow:
+        inset -17px -18px 28px rgba(0, 0, 0, 0.73),
+        inset 7px 8px 16px rgba(255, 255, 255, 0.07);
+    }
+
+    .glow {
+      position: absolute;
+      width: 680px;
+      height: 420px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.025);
+      filter: blur(80px);
+      z-index: -3;
+      pointer-events: none;
+    }
+
+    main {
+      position: relative;
+      width: min(780px, calc(100vw - 40px));
+      min-height: 455px;
+      padding: 48px 48px 42px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background:
+        linear-gradient(
+          145deg,
+          rgba(255, 255, 255, 0.075),
+          rgba(255, 255, 255, 0.02) 35%,
+          rgba(0, 0, 0, 0.25)
+        ),
+        var(--glass);
+      backdrop-filter: blur(25px) saturate(120%);
+      -webkit-backdrop-filter: blur(25px) saturate(120%);
+      box-shadow:
+        0 35px 100px rgba(0, 0, 0, 0.7),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.025);
+      overflow: hidden;
+    }
+
+    main::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border-radius: inherit;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.07),
+          transparent 28%,
+          transparent 70%,
+          rgba(255, 255, 255, 0.018)
+        );
+    }
+
+    main::after {
+      content: "";
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      right: 35px;
+      top: 104px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.65);
+      box-shadow:
+        0 7px 0 rgba(255,255,255,0.38),
+        0 14px 0 rgba(255,255,255,0.18);
+      opacity: 0.9;
+    }
+
+    .content {
+      position: relative;
       z-index: 1;
     }
 
-    .eyebrow { 
-      color: #a3b8e0; 
-      font-weight: 600; 
-      letter-spacing: .1em; 
-      text-transform: uppercase; 
-      font-size: .75rem; 
-      opacity: 0.8;
-    }
-    
-    h1 { 
-      margin: 10px 0; 
-      font-size: clamp(2rem, 6vw, 3rem); 
+    .eyebrow {
+      margin-bottom: 16px;
+      color: #888984;
+      font-size: 13px;
       font-weight: 500;
-      letter-spacing: -0.02em;
+      letter-spacing: 0.04em;
     }
-    
-    p { color: #9ba8c8; line-height: 1.6; }
-    
-    form { display: flex; gap: 12px; margin-top: 32px; }
-    
-    input { 
-      min-width: 0; 
-      flex: 1; 
-      padding: 16px 20px; 
-      border: 1px solid rgba(255, 255, 255, 0.15); 
-      border-radius: 12px; 
-      background: rgba(0, 0, 0, 0.2); 
-      color: #fff; 
-      font-size: 1rem; 
-      transition: border-color 0.3s, box-shadow 0.3s;
+
+    h1 {
+      margin: 0;
+      max-width: 580px;
+      font-size: clamp(3rem, 7vw, 5.7rem);
+      line-height: 0.91;
+      font-weight: 500;
+      letter-spacing: -0.065em;
+      color: #ededeb;
     }
-    input::placeholder { color: rgba(255, 255, 255, 0.3); }
-    input:focus {
+
+    .subtitle {
+      max-width: 500px;
+      margin: 28px 0 0;
+      color: #999a96;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    form {
+      display: flex;
+      gap: 10px;
+      margin-top: 38px;
+    }
+
+    .input-wrap {
+      position: relative;
+      flex: 1;
+    }
+
+    input {
+      width: 100%;
+      height: 56px;
+      padding: 0 18px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 10px;
       outline: none;
-      border-color: rgba(255, 255, 255, 0.4);
-      box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+      background: rgba(0, 0, 0, 0.27);
+      color: #efefed;
+      font: inherit;
+      font-size: 14px;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.025);
+      transition:
+        border-color 180ms ease,
+        background 180ms ease,
+        box-shadow 180ms ease;
     }
-    
-    button { 
-      border: 0; 
-      border-radius: 12px; 
-      padding: 0 28px; 
-      background: #ffffff; 
-      color: #000000; 
-      font-size: 1rem; 
-      font-weight: 600; 
-      cursor: pointer; 
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+
+    input::placeholder {
+      color: #666762;
     }
-    button:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+
+    input:focus {
+      border-color: rgba(255,255,255,0.34);
+      background: rgba(0, 0, 0, 0.38);
+      box-shadow:
+        0 0 0 3px rgba(255,255,255,0.025);
     }
-    button:disabled { opacity: .6; cursor: wait; transform: none; box-shadow: none; }
-    
-    #result { 
-      display: none; 
-      margin-top: 24px; 
-      padding: 18px 20px; 
-      border-radius: 12px; 
-      font-weight: 600; 
+
+    button {
+      height: 56px;
+      padding: 0 24px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      background: #eeeeea;
+      color: #0b0c0b;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition:
+        transform 160ms ease,
+        background 160ms ease,
+        opacity 160ms ease;
+    }
+
+    button:hover {
+      background: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: wait;
+      transform: none;
+    }
+
+    #result {
+      display: none;
+      margin-top: 18px;
+      padding: 16px 18px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      background: rgba(0,0,0,0.25);
+      font-size: 14px;
+      line-height: 1.5;
       backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
     }
-    #result.legitimate { background: rgba(18, 61, 48, 0.4); color: #8ce1b2; border-color: rgba(140, 225, 178, 0.2); }
-    #result.phishing { background: rgba(77, 32, 43, 0.4); color: #ff9fa9; border-color: rgba(255, 159, 169, 0.2); }
-    #result.error { background: rgba(75, 59, 23, 0.4); color: #fce28b; border-color: rgba(252, 226, 139, 0.2); }
-    
-    details { 
-      margin-top: 32px; 
-      padding: 18px; 
-      border: 1px solid rgba(255, 255, 255, 0.08); 
-      border-radius: 12px; 
-      background: rgba(0, 0, 0, 0.15); 
-      transition: background 0.3s;
+
+    #result.legitimate {
+      display: block;
+      color: #b8e6c7;
+      border-color: rgba(120, 220, 160, 0.18);
+      background: rgba(35, 100, 60, 0.18);
     }
-    details[open] { background: rgba(255, 255, 255, 0.03); }
-    summary { color: #dce6ff; font-weight: 600; cursor: pointer; user-select: none; }
-    details p, details ul { margin: 14px 0 0; color: #9ba8c8; }
-    details li { margin: 8px 0; line-height: 1.5; }
-    
+
+    #result.phishing {
+      display: block;
+      color: #f0b8bd;
+      border-color: rgba(230, 100, 110, 0.18);
+      background: rgba(120, 30, 40, 0.18);
+    }
+
+    #result.error {
+      display: block;
+      color: #e8d49e;
+      border-color: rgba(220, 185, 90, 0.16);
+      background: rgba(120, 90, 25, 0.16);
+    }
+
+    details {
+      position: relative;
+      z-index: 1;
+      margin-top: 30px;
+      border-top: 1px solid rgba(255,255,255,0.09);
+      padding-top: 18px;
+    }
+
+    summary {
+      list-style: none;
+      cursor: pointer;
+      color: #8c8d89;
+      font-size: 13px;
+      font-weight: 500;
+      user-select: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::after {
+      content: "+";
+      float: right;
+      color: #6f706d;
+      font-size: 18px;
+      line-height: 12px;
+      transition: transform 180ms ease;
+    }
+
+    details[open] summary::after {
+      transform: rotate(45deg);
+    }
+
+    details p,
+    details ul {
+      margin-top: 18px;
+    }
+
+    details p {
+      color: #8d8e8a;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    details ul {
+      padding-left: 18px;
+    }
+
+    details li {
+      margin: 8px 0;
+      color: #7f807c;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
     .note {
+      margin: 25px 0 0;
+      color: #575854;
+      font-size: 11px;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 750px) {
+      body {
+        overflow-y: auto;
+      }
+
+      .scene {
+        min-height: 100vh;
+        height: auto;
+        padding: 40px 20px;
+      }
+
+      .ambient.one {
+        left: -70px;
+      }
+
+      .ambient.two {
+        left: 35%;
+      }
+
+      .ambient.three {
+        left: auto;
+        right: -40px;
+      }
+
+      main {
+        width: min(100%, 680px);
+        min-height: unset;
+        padding: 38px 28px 30px;
+      }
+
+      h1 {
+        font-size: clamp(3.2rem, 16vw, 5rem);
+      }
+    }
+
+    @media (max-width: 560px) {
+      form {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      main::after {
+        right: 24px;
+        top: 84px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="scene">
+    <div class="glow"></div>
+    <div class="ambient one"></div>
+    <div class="ambient two"></div>
+    <div class="ambient three"></div>
+
+    <main>
+      <div class="content">
+
+        <div class="eyebrow">
+          Security tool
+        </div>
+
+        <h1>
+          Phishing<br>
+          Detector
+        </h1>
+
+        <p class="subtitle">
+          Check a suspicious link before you open it.
+          Analyze a URL and see whether it looks legitimate or potentially dangerous.
+        </p>
+
+        <form id="checker">
+          <div class="input-wrap">
+            <input
+              id="url"
+              type="text"
+              placeholder="example.com or https://example.com"
+              required
+              autocomplete="url"
+            >
+          </div>
+
+          <button id="submit" type="submit">
+            Check link
+          </button>
+        </form>
+
+        <div
+          id="result"
+          role="status"
+          aria-live="polite"
+        ></div>
+
+        <details>
+          <summary>How was this created?</summary>
+
+          <p>
+            This project uses a Random Forest machine-learning model trained
+            on a phishing-URL dataset and additional verified legitimate domains.
+          </p>
+
+          <ul>
+            <li>
+              It checks URL signals such as length, digits, special characters,
+              HTTPS, IP addresses, and brand-name similarity.
+            </li>
+
+            <li>
+              It also looks at basic page signals, such as page structure,
+              links, mobile responsiveness, and iframes.
+            </li>
+
+            <li>
+              The model returns a prediction and confidence score,
+              but it cannot guarantee a website is safe.
+            </li>
+
+            <li>
+              Some websites block automated checks. In that case,
+              the app says it could not inspect the site instead of guessing.
+            </li>
+          </ul>
+        </details>
+
+        <p class="note">
+          Educational prediction tool. Do not enter passwords or personal
+          information on a website you do not trust.
+        </p>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const form = document.querySelector('#checker');
+    const input = document.querySelector('#url');
+    const button = document.querySelector('#submit');
+    const result = document.querySelector('#result');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      button.disabled = true;
+      button.textContent = 'Checking…';
+
+      result.className = '';
+      result.style.display = 'none';
+
+      try {
+        const response = await fetch('/predict', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            url: input.value.trim()
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Something went wrong.');
+        }
+
+        const isLegitimate = data.prediction === 'Legitimate';
+
+        result.className = isLegitimate
+          ? 'legitimate'
+          : 'phishing';
+
+        result.textContent =
+          `${data.prediction} — ${data.confidence}% confidence`;
+
+      } catch (error) {
+        result.className = 'error';
+        result.textContent = error.message;
+      } finally {
+        result.style.display = 'block';
+        button.disabled = false;
+        button.textContent = 'Check link';
+      }
+    });
+  </script>
+</body>
+</html>
