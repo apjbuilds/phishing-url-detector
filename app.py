@@ -29,9 +29,7 @@ else:
     url_only_model = None
     url_only_feature_order = None
 
-# Known-legitimate domains - checked before running the ML model at all.
-# Real phishing detectors (Google Safe Browsing, etc.) use allowlists like this
-# for well-known sites rather than relying purely on a live classifier.
+
 try:
     with open('allowlist_domains.txt', 'r') as f:
         ALLOWLIST = set(line.strip().lower() for line in f if line.strip())
@@ -47,7 +45,10 @@ common_brands = ['amazon', 'paypal', 'metamask', 'microsoft', 'apple', 'google',
 def index():
     return render_template('index.html')
 
-
+   @app.route('/privacy')
+   def privacy():
+       return render_template('privacy.html')
+    
 def brand_similarity(domain):
     domain_clean = domain.lower().replace('www.', '').split('.')[0]
     best_score = 0
@@ -128,7 +129,6 @@ def predict():
         url = 'https://' + url
     url = normalize_for_prediction(url)
 
-    # Fast path: skip the model entirely for well-known domains
     base_domain = get_base_domain(url)
     if base_domain in ALLOWLIST:
         return jsonify({
@@ -141,7 +141,6 @@ def predict():
     page_features = extract_page_features(url)
 
     if page_features is None:
-        # Fall back to a URL-only prediction instead of giving up entirely
         if url_only_model is None:
             return jsonify({
                 'error': 'Could not inspect this website. It may block automated requests or be unavailable.'

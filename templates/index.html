@@ -457,6 +457,16 @@
       line-height: 1.55;
     }
 
+    .note a {
+      color: #7d7e7a;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .note a:hover {
+      color: #aaaaa6;
+    }
+
     @media (max-width: 750px) {
       .scene {
         min-height: 100vh;
@@ -619,7 +629,8 @@
 
         <p class="note">
           Educational prediction tool. Do not enter passwords or personal
-          information on a website you do not trust.
+          information on a website you do not trust. &middot;
+          <a href="/privacy">Privacy Policy</a>
         </p>
 
       </div>
@@ -685,6 +696,7 @@
         button.textContent = 'Check link';
       }
     });
+
   </script>
 </body>
 </html>
