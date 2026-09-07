@@ -45,10 +45,12 @@ common_brands = ['amazon', 'paypal', 'metamask', 'microsoft', 'apple', 'google',
 def index():
     return render_template('index.html')
 
-   @app.route('/privacy')
-   def privacy():
-       return render_template('privacy.html')
-    
+
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
+
 def brand_similarity(domain):
     domain_clean = domain.lower().replace('www.', '').split('.')[0]
     best_score = 0
